@@ -12,6 +12,8 @@ environment:
 dependencies:
   firebase_auth: ^5.4.1
   firebase_core: ^3.10.1
+  firebase_dynamic_links: ^6.1.1
+  firebase_ui_auth: ^1.16.1
   flutter:
     sdk: flutter
   flutter_localizations:
