@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:habit_tracker/src/screens/main_page/habits_screen.dart';
 
 import '../settings/settings_view.dart';
 
@@ -17,7 +18,7 @@ class MainPage extends StatelessWidget {
 
     if (user != null) {
       // User is already signed in, navigate to another screen
-      return const ProfileScreen();
+      return HabitsScreen();
     }
 
     return Scaffold(
