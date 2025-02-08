@@ -6,7 +6,7 @@ import '../../widgets/rounded_pill_button.dart';
 class HabitsScreen extends StatefulWidget {
   HabitsScreen({super.key});
 
-  final String title = "Habbit tracker";
+  final String title = "Habit tracker";
 
   @override
   State<HabitsScreen> createState() => _HabitScreenState();
@@ -24,24 +24,28 @@ class _HabitScreenState extends State<HabitsScreen> {
       appBar: MyAppBar(title: widget.title),
       backgroundColor: Colors.black,
       body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0), // Add padding here
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               RoundedPillButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CreateHabitScreen()),
-                );
-              },
-              text: "Create Habbit",
-              icon:  Icons.add_circle_rounded,
-              backgroundColor: Colors.white70,
-              textColor: Colors.black87,
-              iconColor: Colors.black87,
-              width: 360,
-            ),
+                radius: 16,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CreateHabitScreen()),
+                  );
+                },
+                text: "Create Habit",
+                icon: Icons.add_circle_rounded,
+                backgroundColor: Colors.white70,
+                textColor: Colors.black87,
+                iconColor: Colors.black87,
+                width: 360,
+              ),
+              const SizedBox(height: 20.0), // Add spacing between button and text
               const Text(
                 "No habits yet :)",
                 textAlign: TextAlign.center,
@@ -54,6 +58,7 @@ class _HabitScreenState extends State<HabitsScreen> {
             ],
           ),
         ),
+      ),
     );
   }
 }

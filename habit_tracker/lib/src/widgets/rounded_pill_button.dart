@@ -8,6 +8,7 @@ class RoundedPillButton extends StatelessWidget {
   final Color textColor;
   final Color iconColor;
   final double? width;
+  final double? radius;
 
   RoundedPillButton({
     required this.onPressed,
@@ -17,6 +18,7 @@ class RoundedPillButton extends StatelessWidget {
     this.textColor = Colors.white,
     this.iconColor = Colors.white,
     this.width, // Allow width to be optional
+    this.radius
   });
 
   @override
@@ -28,7 +30,7 @@ class RoundedPillButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30.0),
+            borderRadius: BorderRadius.circular(radius ?? 30.0),
           ),
           padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
         ),
