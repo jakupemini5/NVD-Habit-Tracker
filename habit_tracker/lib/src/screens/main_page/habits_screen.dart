@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/src/screens/habit/create_habit_screen.dart';
 import 'package:habit_tracker/src/models/habit_model.dart';
+import 'package:habit_tracker/src/screens/habit/habit_detail_screen.dart';
 import 'package:habit_tracker/src/widgets/habbit_card.dart';
 import 'package:habit_tracker/src/widgets/rounded_pill_button.dart';
 import '../../widgets/my_app_bar.dart';
@@ -48,7 +49,8 @@ class _HabitScreenState extends State<HabitsScreen> {
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('habits')
-                    .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                    .where('userId',
+                        isEqualTo: FirebaseAuth.instance.currentUser!.uid)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
@@ -78,13 +80,26 @@ class _HabitScreenState extends State<HabitsScreen> {
                         userId: habitData['userId'],
                         name: habitData['name'],
                         description: habitData['description'],
-                        type: HabitType.values.firstWhere((type) => type.name == habitData['type']),
-                        createdAt: (habitData['createdAt'] as Timestamp?)?.toDate(),
-                        updatedAt: (habitData['updatedAt'] as Timestamp?)?.toDate(),
-                        daysOfWeek: (habitData['daysOfWeek'] as List?)?.map((e) => e as String).toList(),
+                        type: HabitType.values.firstWhere(
+                            (type) => type.name == habitData['type']),
+                        createdAt:
+                            (habitData['createdAt'] as Timestamp?)?.toDate(),
+                        updatedAt:
+                            (habitData['updatedAt'] as Timestamp?)?.toDate(),
+                        daysOfWeek: (habitData['daysOfWeek'] as List?)
+                            ?.map((e) => e as String)
+                            .toList(),
                         dayOfMonth: habitData['dayOfMonth'],
                       );
-                      return HabitCard(habit: habit);
+                      return HabitCard(
+                          habit: habit,
+                          onClick: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HabitDetailScreen(habit: habit,)),
+                            );
+                          });
                     },
                   );
                 },

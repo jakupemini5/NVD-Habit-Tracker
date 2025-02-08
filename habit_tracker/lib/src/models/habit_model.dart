@@ -32,6 +32,7 @@ class HabitModel {
   int? targetNumber; // For NumberReached type
   List<String>? daysOfWeek; // For Weekly type
   int? dayOfMonth; // For Monthly type
+  List<Map<String, dynamic>>? updateHistory; // To track updates
 
   HabitModel({
     required this.userId,
@@ -43,6 +44,7 @@ class HabitModel {
     this.targetNumber,
     this.daysOfWeek,
     this.dayOfMonth,
+    this.updateHistory,
   });
 
   Map<String, dynamic> toJson() {
@@ -56,6 +58,8 @@ class HabitModel {
       'targetNumber': targetNumber,
       'daysOfWeek': daysOfWeek,
       'dayOfMonth': dayOfMonth,
+      'updateHistory': updateHistory,
     };
   }
 }
+
