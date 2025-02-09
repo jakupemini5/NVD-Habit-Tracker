@@ -91,15 +91,22 @@ class _HabitScreenState extends State<HabitsScreen> {
                             .toList(),
                         dayOfMonth: habitData['dayOfMonth'],
                       );
-                      return HabitCard(
+                      return Hero(
+                        tag: 'habit_${habit.name}', // Add this line
+                        child: HabitCard(
                           habit: habit,
                           onClick: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => HabitDetailScreen(habit: habit,)),
+                                builder: (context) =>
+                                    HabitDetailScreen(habit: habit),
+                              ),
                             );
-                          });
+                          },
+                        ),
+                      );
+                      ;
                     },
                   );
                 },

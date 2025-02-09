@@ -1,6 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/src/models/habit_model.dart';
+import 'package:habit_tracker/src/widgets/habbit_card.dart';
+import 'package:habit_tracker/src/widgets/my_app_bar.dart';
 
 class HabitDetailScreen extends StatefulWidget {
   final HabitModel habit;
@@ -12,112 +13,33 @@ class HabitDetailScreen extends StatefulWidget {
 }
 
 class _HabitDetailScreenState extends State<HabitDetailScreen> {
-  TextEditingController _targetNumberController = TextEditingController();
-  TextEditingController _daysOfWeekController = TextEditingController();
-  TextEditingController _dayOfMonthController = TextEditingController();
+  late TextEditingController _targetNumberController;
+  List<String> _selectedDays = [];
+  final List<String> _daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   @override
   void initState() {
     super.initState();
-    if (widget.habit.type == HabitType.NumberReached) {
-      _targetNumberController.text = widget.habit.targetNumber?.toString() ?? '';
-    }
+    _targetNumberController = TextEditingController(text: widget.habit.targetNumber.toString());
     if (widget.habit.type == HabitType.Weekly) {
-      _daysOfWeekController.text = widget.habit.daysOfWeek?.join(', ') ?? '';
-    }
-    if (widget.habit.type == HabitType.Monthly) {
-      _dayOfMonthController.text = widget.habit.dayOfMonth?.toString() ?? '';
-    }
-  }
-
-  Future<void> _updateHabit() async {
-    try {
-      if (widget.habit.type == HabitType.NumberReached) {
-        widget.habit.targetNumber = int.tryParse(_targetNumberController.text);
-      }
-      if (widget.habit.type == HabitType.Weekly) {
-        widget.habit.daysOfWeek = _daysOfWeekController.text.split(',').map((e) => e.trim()).toList();
-      }
-      if (widget.habit.type == HabitType.Monthly) {
-        widget.habit.dayOfMonth = int.tryParse(_dayOfMonthController.text);
-      }
-
-      widget.habit.updatedAt = DateTime.now();
-      widget.habit.updateHistory = (widget.habit.updateHistory ?? [])..add({
-        'updatedAt': widget.habit.updatedAt,
-        'targetNumber': widget.habit.targetNumber,
-        'daysOfWeek': widget.habit.daysOfWeek,
-        'dayOfMonth': widget.habit.dayOfMonth,
-      });
-
-      await FirebaseFirestore.instance
-          .collection('habits')
-          .doc(widget.habit.userId)
-          .update(widget.habit.toJson());
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Habit updated successfully!')),
-      );
-
-      setState(() {});
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error updating habit: $e')),
-      );
+      _selectedDays = List.from(widget.habit.daysOfWeek ?? []);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.habit.name)),
+      backgroundColor: Colors.black,
+      appBar: MyAppBar(title: widget.habit.name),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Description: ${widget.habit.description}'),
-            SizedBox(height: 10),
-            Text('Type: ${widget.habit.type.name}'),
-            if (widget.habit.type == HabitType.NumberReached)
-              TextField(
-                controller: _targetNumberController,
-                decoration: InputDecoration(labelText: 'Target Number'),
-                keyboardType: TextInputType.number,
-              ),
-            if (widget.habit.type == HabitType.Weekly)
-              TextField(
-                controller: _daysOfWeekController,
-                decoration: InputDecoration(labelText: 'Days of the Week (comma separated)'),
-              ),
-            if (widget.habit.type == HabitType.Monthly)
-              TextField(
-                controller: _dayOfMonthController,
-                decoration: InputDecoration(labelText: 'Day of the Month'),
-                keyboardType: TextInputType.number,
-              ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _updateHabit,
-              child: Text('Update Habit'),
-            ),
-            SizedBox(height: 20),
-            Text('Update History:'),
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.habit.updateHistory?.length ?? 0,
-                itemBuilder: (context, index) {
-                  var history = widget.habit.updateHistory![index];
-                  return ListTile(
-                    title: Text('Updated at: ${history['updatedAt']}'),
-                    subtitle: Text(
-                      'Target Number: ${history['targetNumber']}, '
-                      'Days of Week: ${history['daysOfWeek']}, '
-                      'Day of Month: ${history['dayOfMonth']}',
-                    ),
-                  );
-                },
-              ),
+            Hero(
+              tag: 'habit_${widget.habit.name}', // Add this line
+              child: HabitCard(habit: widget.habit),
             ),
           ],
         ),

@@ -1,23 +1,15 @@
 enum HabitType {
-  OncePerDay,
-  NumberReached,
+  Daily,
   Weekly,
-  Monthly,
 }
 
 extension HabitTypeExtension on HabitType {
   String get name {
     switch (this) {
-      case HabitType.OncePerDay:
-        return "Once per day";
-      case HabitType.NumberReached:
-        return "Number reached";
+      case HabitType.Daily:
+        return "Daily";
       case HabitType.Weekly:
         return "Weekly";
-      case HabitType.Monthly:
-        return "Monthly";
-      default:
-        return "";
     }
   }
 }

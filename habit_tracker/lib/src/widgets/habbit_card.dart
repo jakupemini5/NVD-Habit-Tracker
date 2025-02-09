@@ -3,9 +3,9 @@ import 'package:habit_tracker/src/models/habit_model.dart';
 
 class HabitCard extends StatelessWidget {
   final HabitModel habit;
-  final VoidCallback onClick;
+  final VoidCallback? onClick;
 
-  HabitCard({required this.habit, required this.onClick});
+  HabitCard({required this.habit, this.onClick});
 
   @override
   Widget build(BuildContext context) {

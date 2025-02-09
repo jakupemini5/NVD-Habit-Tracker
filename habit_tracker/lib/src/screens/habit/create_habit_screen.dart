@@ -19,29 +19,20 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _targetNumberController = TextEditingController();
-  final TextEditingController _dayOfMonthController = TextEditingController();
-  HabitType _selectedType = HabitType.OncePerDay;
+  HabitType _selectedType = HabitType.Daily;
   List<String> _selectedDaysOfWeek = [];
-
-  final List<HabitType> _habitTypes = [
-    HabitType.OncePerDay,
-    HabitType.NumberReached,
-    HabitType.Weekly,
-    HabitType.Monthly,
-  ];
 
   Future<void> _saveHabit() async {
     if (_formKey.currentState!.validate()) {
       try {
         HabitModel newHabit = HabitModel(
-          userId: FirebaseAuth.instance.currentUser!.uid.toString(), // Replace with actual user ID
+          userId: FirebaseAuth.instance.currentUser!.uid.toString(),
           name: _nameController.text.trim(),
           description: _descriptionController.text.trim(),
           type: _selectedType,
           createdAt: DateTime.now(),
-          targetNumber: _selectedType == HabitType.NumberReached ? int.tryParse(_targetNumberController.text) : null,
+          targetNumber: int.tryParse(_targetNumberController.text),
           daysOfWeek: _selectedType == HabitType.Weekly ? _selectedDaysOfWeek : null,
-          dayOfMonth: _selectedType == HabitType.Monthly ? int.tryParse(_dayOfMonthController.text) : null,
         );
 
         await FirebaseFirestore.instance.collection('habits').add(newHabit.toJson());
@@ -104,7 +95,7 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<HabitType>(
                   value: _selectedType,
-                  items: _habitTypes.map((type) {
+                  items: HabitType.values.map((type) {
                     return DropdownMenuItem(value: type, child: Text(type.name));
                   }).toList(),
                   onChanged: (value) {
@@ -117,19 +108,18 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 16),
-                if (_selectedType == HabitType.NumberReached)
-                  TextFormField(
-                    controller: _targetNumberController,
-                    decoration: _buildInputDecoration('Target Number'),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (_selectedType == HabitType.NumberReached && (value == null || value.isEmpty)) {
-                        return 'Please enter a target number';
-                      }
-                      return null;
-                    },
-                    style: const TextStyle(color: Colors.white),
-                  ),
+                TextFormField(
+                  controller: _targetNumberController,
+                  decoration: _buildInputDecoration('Target Number'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a target number';
+                    }
+                    return null;
+                  },
+                  style: const TextStyle(color: Colors.white),
+                ),
                 if (_selectedType == HabitType.Weekly)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,33 +152,19 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
                       ),
                     ],
                   ),
-                if (_selectedType == HabitType.Monthly)
-                  TextFormField(
-                    controller: _dayOfMonthController,
-                    decoration: _buildInputDecoration('Day of the Month'),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (_selectedType == HabitType.Monthly && (value == null || value.isEmpty)) {
-                        return 'Please enter a day of the month';
-                      }
-                      return null;
-                    },
-                    style: const TextStyle(color: Colors.white),
-                  ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
-                  child:  RoundedPillButton(
-                radius: 16,
-                onPressed: _saveHabit,
-                text: "Create Habit",
-                icon: Icons.add_circle_rounded,
-                backgroundColor: Colors.white70,
-                textColor: Colors.black87,
-                iconColor: Colors.black87,
-                width: 360,
-              ),
-                  
+                  child: RoundedPillButton(
+                    radius: 16,
+                    onPressed: _saveHabit,
+                    text: "Create Habit",
+                    icon: Icons.add_circle_rounded,
+                    backgroundColor: Colors.white70,
+                    textColor: Colors.black87,
+                    iconColor: Colors.black87,
+                    width: 360,
+                  ),
                 ),
               ],
             ),
