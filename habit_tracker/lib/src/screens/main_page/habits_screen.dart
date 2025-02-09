@@ -90,6 +90,8 @@ class _HabitScreenState extends State<HabitsScreen> {
                             ?.map((e) => e as String)
                             .toList(),
                         dayOfMonth: habitData['dayOfMonth'],
+                        targetNumber: habitData['targetNumber'],
+                        habitId: habitData.id,
                       );
                       return Hero(
                         tag: 'habit_${habit.name}', // Add this line

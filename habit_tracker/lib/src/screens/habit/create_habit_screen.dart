@@ -32,10 +32,15 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
           type: _selectedType,
           createdAt: DateTime.now(),
           targetNumber: int.tryParse(_targetNumberController.text),
-          daysOfWeek: _selectedType == HabitType.Weekly ? _selectedDaysOfWeek : null,
+          daysOfWeek:
+              _selectedType == HabitType.Weekly ? _selectedDaysOfWeek : null,
         );
 
-        await FirebaseFirestore.instance.collection('habits').add(newHabit.toJson());
+        await FirebaseFirestore.instance.collection('habits').add({
+          ...newHabit.toJson(),
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Habit added successfully!')),
@@ -96,7 +101,8 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
                 DropdownButtonFormField<HabitType>(
                   value: _selectedType,
                   items: HabitType.values.map((type) {
-                    return DropdownMenuItem(value: type, child: Text(type.name));
+                    return DropdownMenuItem(
+                        value: type, child: Text(type.name));
                   }).toList(),
                   onChanged: (value) {
                     setState(() {
@@ -132,9 +138,18 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
                       Wrap(
                         spacing: 8,
                         children: [
-                          for (var day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+                          for (var day in [
+                            'Mon',
+                            'Tue',
+                            'Wed',
+                            'Thu',
+                            'Fri',
+                            'Sat',
+                            'Sun'
+                          ])
                             FilterChip(
-                              label: Text(day, style: const TextStyle(color: Colors.white)),
+                              label: Text(day,
+                                  style: const TextStyle(color: Colors.white)),
                               selected: _selectedDaysOfWeek.contains(day),
                               onSelected: (selected) {
                                 setState(() {

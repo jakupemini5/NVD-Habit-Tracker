@@ -1,3 +1,6 @@
+import 'package:uuid/uuid.dart';
+import 'habit_history_entry.dart';
+
 enum HabitType {
   Daily,
   Weekly,
@@ -15,6 +18,7 @@ extension HabitTypeExtension on HabitType {
 }
 
 class HabitModel {
+  String? habitId;
   String userId;
   String name;
   String description;
@@ -24,7 +28,7 @@ class HabitModel {
   int? targetNumber; // For NumberReached type
   List<String>? daysOfWeek; // For Weekly type
   int? dayOfMonth; // For Monthly type
-  List<Map<String, dynamic>>? updateHistory; // To track updates
+  List<HabitHistoryEntry> history; // Track updates
 
   HabitModel({
     required this.userId,
@@ -36,22 +40,30 @@ class HabitModel {
     this.targetNumber,
     this.daysOfWeek,
     this.dayOfMonth,
-    this.updateHistory,
-  });
+    this.habitId,
+    List<HabitHistoryEntry>? history,
+    
+  })  : history = history ?? [];
 
+  // Convert to JSON
   Map<String, dynamic> toJson() {
     return {
+      'habitId': habitId,
       'userId': userId,
       'name': name,
       'description': description,
       'type': type.name,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
       'targetNumber': targetNumber,
       'daysOfWeek': daysOfWeek,
       'dayOfMonth': dayOfMonth,
-      'updateHistory': updateHistory,
+      'history': history.map((entry) => entry.toJson()).toList(),
     };
   }
-}
 
+  // Add a new history entry
+  void addHistoryEntry(int numberReached) {
+    history.add(HabitHistoryEntry(date: DateTime.now(), numberReached: numberReached));
+  }
+}
