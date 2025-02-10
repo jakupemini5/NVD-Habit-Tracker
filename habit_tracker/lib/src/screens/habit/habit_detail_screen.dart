@@ -6,6 +6,7 @@ import 'package:lottie/lottie.dart';
 import 'package:habit_tracker/src/models/habit_model.dart';
 import 'package:habit_tracker/src/widgets/habbit_card.dart';
 import 'package:habit_tracker/src/widgets/my_app_bar.dart';
+import 'package:habit_tracker/src/widgets/rounded_pill_button.dart';
 
 class HabitDetailScreen extends StatefulWidget {
   final HabitModel habit;
@@ -55,71 +56,40 @@ class HabitDetailScreenState extends State<HabitDetailScreen>
     super.dispose();
   }
 
-  void _updateNumberReached(int change) {
-    setState(() {
-      DateTime today = DateTime.now();
-      HabitHistoryEntry? todayEntry = widget.habit.history.firstWhere(
-        (entry) =>
-            entry.date.year == today.year &&
-            entry.date.month == today.month &&
-            entry.date.day == today.day,
-        orElse: () => HabitHistoryEntry(date: today, numberReached: 0),
-      );
-
-      int current = todayEntry.numberReached;
-      int newValue = (current + change).clamp(0, 999);
-      todayEntry.numberReached = newValue;
-
-      if (todayEntry.numberReached != 0 &&
-          !widget.habit.history.contains(todayEntry)) {
-        widget.habit.addHistoryEntry(newValue);
-      } else {
-        int index = widget.habit.history.indexWhere(
-          (entry) =>
-              entry.date.year == today.year &&
-              entry.date.month == today.month &&
-              entry.date.day == today.day,
-        );
-        if (index != -1) {
-          widget.habit.history[index] = todayEntry;
-        }
-      }
-
-      _targetNumberController.text = newValue.toString();
-      _saveToFirestore();
-
-      // Check if target is met
-      if (newValue == widget.habit.targetNumber! && !_showAnimation) {
-        _triggerSuccessAnimation();
-      }
-    });
-  }
-
-  void _triggerSuccessAnimation() {
-    setState(() {
-      _showAnimation = true;
-    });
-
-    debugPrint("Triggering success animation");
-    _animationController.forward();
-
-    _animationController.forward();
-  }
-
-  void _saveToFirestore() {
-    FirebaseFirestore.instance
-        .collection('habits')
-        .doc(widget.habit.habitId)
-        .update({
-      'history': widget.habit.history.map((entry) => entry.toJson()).toList(),
-    });
+  void _deleteHabit() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Habit"),
+        content: const Text("Are you sure you want to delete this habit?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              await FirebaseFirestore.instance
+                  .collection('habits')
+                  .doc(widget.habit.habitId)
+                  .delete();
+              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Close detail screen
+            },
+            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: MyAppBar(title: widget.habit.name),
+      appBar: MyAppBar(
+        title: widget.habit.name,
+      ),
       body: Stack(
         children: [
           Padding(
@@ -127,19 +97,26 @@ class HabitDetailScreenState extends State<HabitDetailScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                RoundedPillButton(
+                  text: "Delete",
+                  backgroundColor: const Color.fromARGB(118, 244, 67, 54),
+                  onPressed: _deleteHabit,
+                  icon: Icons.delete,   
+                  radius: 16,
+                  width: 360,
+                ),
+                const SizedBox(height: 20),
                 Hero(
                   tag: 'habit_${widget.habit.name}',
                   child: HabitCard(habit: widget.habit),
                 ),
                 const SizedBox(height: 20),
-
-                // Target Number Controls
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.remove, color: Colors.white),
-                      onPressed: () => _updateNumberReached(-1),
+                      onPressed: () {},
                     ),
                     Text(
                       _targetNumberController.text,
@@ -147,12 +124,11 @@ class HabitDetailScreenState extends State<HabitDetailScreen>
                     ),
                     IconButton(
                       icon: const Icon(Icons.add, color: Colors.white),
-                      onPressed: () => _updateNumberReached(1),
+                      onPressed: () {},
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                // Habit History
                 Expanded(
                   child: Column(
                     children: [
@@ -163,7 +139,6 @@ class HabitDetailScreenState extends State<HabitDetailScreen>
               ],
             ),
           ),
-          // Success Animation Overlay
           if (_showAnimation)
             Container(
               color: Colors.black54,

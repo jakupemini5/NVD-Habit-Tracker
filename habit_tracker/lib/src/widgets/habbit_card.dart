@@ -12,7 +12,7 @@ class HabitCard extends StatelessWidget {
     return GestureDetector(
       onTap: onClick,
       child: Card(
-        color: Colors.white10,
+        color: const Color.fromARGB(255, 16, 16, 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 5,
         child: Container(
