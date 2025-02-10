@@ -10,7 +10,7 @@ import 'package:habit_tracker/src/widgets/rounded_pill_button.dart';
 import '../../widgets/my_app_bar.dart';
 
 class HabitsScreen extends StatefulWidget {
-  HabitsScreen({super.key});
+  const HabitsScreen({super.key});
 
   final String title = "Habit Tracker";
 
@@ -35,7 +35,7 @@ class _HabitScreenState extends State<HabitsScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CreateHabitScreen()),
+                  MaterialPageRoute(builder: (context) => const CreateHabitScreen()),
                 );
               },
               text: "Create Habit",
@@ -123,7 +123,6 @@ class _HabitScreenState extends State<HabitsScreen> {
                           },
                         ),
                       );
-                      ;
                     },
                   );
                 },

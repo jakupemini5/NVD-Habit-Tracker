@@ -6,7 +6,7 @@ import 'package:habit_tracker/src/widgets/rounded_pill_button.dart';
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
 
-  MyAppBar({
+  const MyAppBar({
     super.key,
     required this.title,
   });
@@ -34,7 +34,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                  MaterialPageRoute(builder: (context) => const ProfileScreen()),
                 );
               },
               text: "Profile",

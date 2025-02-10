@@ -6,20 +6,21 @@ class HabitProgressCard extends StatelessWidget {
   final HabitModel habit;
 
   const HabitProgressCard({
-    Key? key,
+    super.key,
     required this.habit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white10,
       elevation: 5,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Progress Overview',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -32,7 +33,7 @@ class HabitProgressCard extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'Target: ${habit.targetNumber}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.orange,
                 ),

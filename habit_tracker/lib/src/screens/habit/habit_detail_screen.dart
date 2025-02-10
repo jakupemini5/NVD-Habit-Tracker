@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/src/models/habit_history_entry.dart';
 import 'package:habit_tracker/src/widgets/habbit_progress_card.dart';
-import 'package:habit_tracker/src/widgets/habit_progress_chart.dart';
 import 'package:lottie/lottie.dart';
 import 'package:habit_tracker/src/models/habit_model.dart';
 import 'package:habit_tracker/src/widgets/habbit_card.dart';
@@ -11,25 +10,24 @@ import 'package:habit_tracker/src/widgets/my_app_bar.dart';
 class HabitDetailScreen extends StatefulWidget {
   final HabitModel habit;
 
-  HabitDetailScreen({required this.habit});
+  const HabitDetailScreen({super.key, required this.habit});
 
   @override
-  _HabitDetailScreenState createState() => _HabitDetailScreenState();
+  HabitDetailScreenState createState() => HabitDetailScreenState();
 }
 
-class _HabitDetailScreenState extends State<HabitDetailScreen> with SingleTickerProviderStateMixin {
+class HabitDetailScreenState extends State<HabitDetailScreen>
+    with SingleTickerProviderStateMixin {
   late TextEditingController _targetNumberController;
   late AnimationController _animationController;
   bool _showAnimation = false;
-  List<String> _selectedDays = [];
-  final List<String> _daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1500),
     );
 
     _animationController.addStatusListener((status) {
@@ -42,12 +40,12 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> with SingleTicker
     });
 
     int initialNumber = widget.habit.history.isNotEmpty
-        ? widget.habit.history.map((e) => e.numberReached).reduce((a, b) => a > b ? a : b)
+        ? widget.habit.history
+            .map((e) => e.numberReached)
+            .reduce((a, b) => a > b ? a : b)
         : 0;
-    _targetNumberController = TextEditingController(text: initialNumber.toString());
-    if (widget.habit.type == HabitType.Weekly) {
-      _selectedDays = List.from(widget.habit.daysOfWeek ?? []);
-    }
+    _targetNumberController =
+        TextEditingController(text: initialNumber.toString());
   }
 
   @override
@@ -72,7 +70,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> with SingleTicker
       int newValue = (current + change).clamp(0, 999);
       todayEntry.numberReached = newValue;
 
-      if (todayEntry.numberReached != 0 && !widget.habit.history.contains(todayEntry)) {
+      if (todayEntry.numberReached != 0 &&
+          !widget.habit.history.contains(todayEntry)) {
         widget.habit.addHistoryEntry(newValue);
       } else {
         int index = widget.habit.history.indexWhere(
@@ -101,12 +100,8 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> with SingleTicker
       _showAnimation = true;
     });
 
-    if (_animationController == null) {
-    debugPrint("AnimationController is not initialized yet!");
-  } else {
     debugPrint("Triggering success animation");
     _animationController.forward();
-  }
 
     _animationController.forward();
   }
@@ -136,28 +131,27 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> with SingleTicker
                   tag: 'habit_${widget.habit.name}',
                   child: HabitCard(habit: widget.habit),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Target Number Controls
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.remove, color: Colors.white),
+                      icon: const Icon(Icons.remove, color: Colors.white),
                       onPressed: () => _updateNumberReached(-1),
                     ),
                     Text(
                       _targetNumberController.text,
-                      style: TextStyle(fontSize: 24, color: Colors.white),
+                      style: const TextStyle(fontSize: 24, color: Colors.white),
                     ),
                     IconButton(
-                      icon: Icon(Icons.add, color: Colors.white),
+                      icon: const Icon(Icons.add, color: Colors.white),
                       onPressed: () => _updateNumberReached(1),
                     ),
                   ],
                 ),
-                SizedBox(height: 10),
-
+                const SizedBox(height: 10),
                 // Habit History
                 Expanded(
                   child: Column(

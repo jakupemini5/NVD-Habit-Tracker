@@ -6,7 +6,7 @@ import 'package:habit_tracker/src/widgets/rounded_pill_button.dart';
 import '../../widgets/my_app_bar.dart';
 
 class CreateHabitScreen extends StatefulWidget {
-  CreateHabitScreen({super.key});
+  const CreateHabitScreen({super.key});
 
   final String title = "Habit Tracker";
 
@@ -19,8 +19,8 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _targetNumberController = TextEditingController();
-  HabitType _selectedType = HabitType.Daily;
-  List<String> _selectedDaysOfWeek = [];
+  HabitType _selectedType = HabitType.daily;
+  final List<String> _selectedDaysOfWeek = [];
 
   Future<void> _saveHabit() async {
     if (_formKey.currentState!.validate()) {
@@ -33,7 +33,7 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
           createdAt: DateTime.now(),
           targetNumber: int.tryParse(_targetNumberController.text),
           daysOfWeek:
-              _selectedType == HabitType.Weekly ? _selectedDaysOfWeek : null,
+              _selectedType == HabitType.weekly ? _selectedDaysOfWeek : null,
         );
 
         await FirebaseFirestore.instance.collection('habits').add({
@@ -42,11 +42,19 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
           'updatedAt': FieldValue.serverTimestamp(),
         });
 
+        if (!mounted) {
+          return; 
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Habit added successfully!')),
         );
         Navigator.pop(context);
       } catch (e) {
+        if (!mounted) {
+          return; 
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error adding habit: $e')),
         );
@@ -126,7 +134,7 @@ class _CreateHabitScreenState extends State<CreateHabitScreen> {
                   },
                   style: const TextStyle(color: Colors.white),
                 ),
-                if (_selectedType == HabitType.Weekly)
+                if (_selectedType == HabitType.weekly)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

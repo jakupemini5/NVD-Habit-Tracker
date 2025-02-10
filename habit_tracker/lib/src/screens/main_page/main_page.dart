@@ -18,7 +18,7 @@ class MainPage extends StatelessWidget {
 
     if (user != null) {
       // User is already signed in, navigate to another screen
-      return HabitsScreen();
+      return const HabitsScreen();
     }
 
     return Scaffold(

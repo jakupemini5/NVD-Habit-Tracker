@@ -5,13 +5,14 @@ class HabitCard extends StatelessWidget {
   final HabitModel habit;
   final VoidCallback? onClick;
 
-  HabitCard({required this.habit, this.onClick});
+  const HabitCard({super.key, required this.habit, this.onClick});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onClick,
       child: Card(
+        color: Colors.white10,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 5,
         child: Container(
@@ -24,7 +25,7 @@ class HabitCard extends StatelessWidget {
             children: <Widget>[
               Text(
                 habit.name,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -33,7 +34,7 @@ class HabitCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 habit.description,
-                style: TextStyle(fontSize: 14, color: Colors.white70),
+                style: const TextStyle(fontSize: 14, color: Colors.white70),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -41,11 +42,11 @@ class HabitCard extends StatelessWidget {
               
               Row(
                 children: [
-                  Icon(Icons.category, color: Colors.white70, size: 18),
-                  SizedBox(width: 5),
+                  const Icon(Icons.category, color: Colors.white70, size: 18),
+                  const SizedBox(width: 5),
                   Text(
                     habit.type.name,
-                    style: TextStyle(fontSize: 14, color: Colors.white),
+                    style: const TextStyle(fontSize: 14, color: Colors.white),
                   ),
                 ],
               ),
@@ -54,11 +55,11 @@ class HabitCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.flag, color: Colors.white70, size: 18),
-                    SizedBox(width: 5),
+                    const Icon(Icons.flag, color: Colors.white70, size: 18),
+                    const SizedBox(width: 5),
                     Text(
                       'Target: ${habit.targetNumber}',
-                      style: TextStyle(fontSize: 14, color: Colors.white),
+                      style: const TextStyle(fontSize: 14, color: Colors.white),
                     ),
                   ],
                 ),
@@ -68,11 +69,11 @@ class HabitCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.calendar_today, color: Colors.white70, size: 18),
-                    SizedBox(width: 5),
+                    const Icon(Icons.calendar_today, color: Colors.white70, size: 18),
+                    const SizedBox(width: 5),
                     Text(
                       'Days: ${habit.daysOfWeek!.join(', ')}',
-                      style: TextStyle(fontSize: 14, color: Colors.white),
+                      style: const TextStyle(fontSize: 14, color: Colors.white),
                     ),
                   ],
                 ),
@@ -82,11 +83,11 @@ class HabitCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(Icons.event, color: Colors.white70, size: 18),
-                    SizedBox(width: 5),
+                    const Icon(Icons.event, color: Colors.white70, size: 18),
+                    const SizedBox(width: 5),
                     Text(
                       'Day of Month: ${habit.dayOfMonth}',
-                      style: TextStyle(fontSize: 14, color: Colors.white),
+                      style: const TextStyle(fontSize: 14, color: Colors.white),
                     ),
                   ],
                 ),

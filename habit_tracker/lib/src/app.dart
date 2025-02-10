@@ -69,7 +69,6 @@ class MyApp extends StatelessWidget {
                     return SettingsView(controller: settingsController);
                   case MainPage.routeName:
                     return const MainPage();
-                  case MainPage.routeName:
                   default:
                     return const MainPage();
                 }

@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 class HabitProgressChart extends StatelessWidget {
   final HabitModel habit;
 
-  const HabitProgressChart({Key? key, required this.habit}) : super(key: key);
+  const HabitProgressChart({super.key, required this.habit});
 
   List<FlSpot> _getSpots() {
     // Sort history by date
@@ -23,7 +23,7 @@ class HabitProgressChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final spots = _getSpots();
     if (spots.isEmpty) {
-      return Center(
+      return const Center(
         child: Text(
           'No data available',
           style: TextStyle(color: Colors.white70),
@@ -43,13 +43,13 @@ class HabitProgressChart extends StatelessWidget {
               horizontalInterval: 1,
               verticalInterval: 1,
               getDrawingHorizontalLine: (value) {
-                return FlLine(
+                return const FlLine(
                   color: Colors.white10,
                   strokeWidth: 1,
                 );
               },
               getDrawingVerticalLine: (value) {
-                return FlLine(
+                return const FlLine(
                   color: Colors.white10,
                   strokeWidth: 1,
                 );
@@ -57,10 +57,10 @@ class HabitProgressChart extends StatelessWidget {
             ),
             titlesData: FlTitlesData(
               show: true,
-              rightTitles: AxisTitles(
+              rightTitles: const AxisTitles(
                 sideTitles: SideTitles(showTitles: false),
               ),
-              topTitles: AxisTitles(
+              topTitles: const AxisTitles(
                 sideTitles: SideTitles(showTitles: false),
               ),
               bottomTitles: AxisTitles(
@@ -146,7 +146,7 @@ class HabitProgressChart extends StatelessWidget {
                   color: Colors.orange,
                   barWidth: 2,
                   isStrokeCapRound: true,
-                  dotData: FlDotData(show: false),
+                  dotData: const FlDotData(show: false),
                   dashArray: [5, 5], // Creates a dashed line
                 ),
             ],
@@ -162,7 +162,7 @@ class HabitProgressChart extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: touchedSpot.y.toInt().toString(),
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
                           ),

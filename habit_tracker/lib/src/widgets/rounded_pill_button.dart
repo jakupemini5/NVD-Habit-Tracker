@@ -10,7 +10,7 @@ class RoundedPillButton extends StatelessWidget {
   final double? width;
   final double? radius;
 
-  RoundedPillButton({
+  const RoundedPillButton({super.key, 
     required this.onPressed,
     required this.text,
     required this.icon,
@@ -32,13 +32,13 @@ class RoundedPillButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radius ?? 30.0),
           ),
-          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
         ),
         child: Row(
           mainAxisSize: width == null ? MainAxisSize.min : MainAxisSize.max, // Adjust based on width
           children: [
             Icon(icon, color: iconColor),
-            SizedBox(width: 8.0),
+            const SizedBox(width: 8.0),
             Text(
               text,
               style: TextStyle(

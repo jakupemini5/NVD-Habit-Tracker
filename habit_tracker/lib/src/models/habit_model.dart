@@ -1,17 +1,16 @@
-import 'package:uuid/uuid.dart';
 import 'habit_history_entry.dart';
 
 enum HabitType {
-  Daily,
-  Weekly,
+  daily,
+  weekly,
 }
 
 extension HabitTypeExtension on HabitType {
   String get name {
     switch (this) {
-      case HabitType.Daily:
+      case HabitType.daily:
         return "Daily";
-      case HabitType.Weekly:
+      case HabitType.weekly:
         return "Weekly";
     }
   }
