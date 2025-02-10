@@ -15,6 +15,7 @@ dependencies:
   firebase_core: ^3.10.1
   firebase_dynamic_links: ^6.1.1
   firebase_ui_auth: ^1.16.1
+  fl_chart: ^0.65.0
   flutter:
     sdk: flutter
   flutter_localizations:

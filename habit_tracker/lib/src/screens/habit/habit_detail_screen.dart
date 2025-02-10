@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/src/models/habit_history_entry.dart';
+import 'package:habit_tracker/src/widgets/habbit_progress_card.dart';
+import 'package:habit_tracker/src/widgets/habit_progress_chart.dart';
 import 'package:lottie/lottie.dart';
 import 'package:habit_tracker/src/models/habit_model.dart';
 import 'package:habit_tracker/src/widgets/habbit_card.dart';
@@ -19,15 +21,26 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   late TextEditingController _targetNumberController;
   bool _showAnimation = false;
   List<String> _selectedDays = [];
-  final List<String> _daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  final List<String> _daysOfWeek = [
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun'
+  ];
 
   @override
   void initState() {
     super.initState();
     int initialNumber = widget.habit.history.isNotEmpty
-        ? widget.habit.history.map((e) => e.numberReached).reduce((a, b) => a > b ? a : b)
+        ? widget.habit.history
+            .map((e) => e.numberReached)
+            .reduce((a, b) => a > b ? a : b)
         : 0;
-    _targetNumberController = TextEditingController(text: initialNumber.toString());
+    _targetNumberController =
+        TextEditingController(text: initialNumber.toString());
     if (widget.habit.type == HabitType.Weekly) {
       _selectedDays = List.from(widget.habit.daysOfWeek ?? []);
     }
@@ -38,25 +51,29 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
       // Find today's history entry
       DateTime today = DateTime.now();
       HabitHistoryEntry? todayEntry = widget.habit.history.firstWhere(
-        (entry) => entry.date.year == today.year &&
-                   entry.date.month == today.month &&
-                   entry.date.day == today.day,
+        (entry) =>
+            entry.date.year == today.year &&
+            entry.date.month == today.month &&
+            entry.date.day == today.day,
         orElse: () => HabitHistoryEntry(date: today, numberReached: 0),
       );
 
       // Update the current number reached
       int current = todayEntry.numberReached;
-      int newValue = (current + change).clamp(0, 999); // Prevent negative values
+      int newValue =
+          (current + change).clamp(0, 999); // Prevent negative values
       todayEntry.numberReached = newValue;
 
       // Create or update the history entry
-      if (todayEntry.numberReached != 0 && !widget.habit.history.contains(todayEntry)) {
+      if (todayEntry.numberReached != 0 &&
+          !widget.habit.history.contains(todayEntry)) {
         widget.habit.addHistoryEntry(newValue);
       } else {
         int index = widget.habit.history.indexWhere(
-          (entry) => entry.date.year == today.year &&
-                     entry.date.month == today.month &&
-                     entry.date.day == today.day,
+          (entry) =>
+              entry.date.year == today.year &&
+              entry.date.month == today.month &&
+              entry.date.day == today.day,
         );
         widget.habit.history[index] = todayEntry;
       }
@@ -85,7 +102,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
   }
 
   void _saveToFirestore() {
-    FirebaseFirestore.instance.collection('habits').doc(widget.habit.habitId).update({
+    FirebaseFirestore.instance
+        .collection('habits')
+        .doc(widget.habit.habitId)
+        .update({
       'history': widget.habit.history.map((entry) => entry.toJson()).toList(),
     });
   }
@@ -139,17 +159,10 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
 
             // Habit History
             Expanded(
-              child: ListView.builder(
-                itemCount: widget.habit.history.length,
-                itemBuilder: (context, index) {
-                  final entry = widget.habit.history[index];
-                  return ListTile(
-                    title: Text(
-                      "${entry.date}: ${entry.numberReached}",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  );
-                },
+              child: Column(
+                children: [
+                  HabitProgressCard(habit: widget.habit),
+                ],
               ),
             ),
           ],
