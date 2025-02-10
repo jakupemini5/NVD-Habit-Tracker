@@ -37,6 +37,7 @@ class HabitDetailScreenState extends State<HabitDetailScreen>
           _showAnimation = false;
         });
         _animationController.reset();
+        _animationController.duration = const Duration(milliseconds: 1500);
       }
     });
 
@@ -54,6 +55,58 @@ class HabitDetailScreenState extends State<HabitDetailScreen>
     _animationController.dispose();
     _targetNumberController.dispose();
     super.dispose();
+  }
+
+  void _updateNumberReached(int change) {
+    setState(() {
+      DateTime today = DateTime.now();
+      HabitHistoryEntry? todayEntry = widget.habit.history.firstWhere(
+        (entry) =>
+            entry.date.year == today.year &&
+            entry.date.month == today.month &&
+            entry.date.day == today.day,
+        orElse: () => HabitHistoryEntry(date: today, numberReached: 0),
+      );
+      int current = todayEntry.numberReached;
+      int newValue = (current + change).clamp(0, 999);
+      todayEntry.numberReached = newValue;
+      if (todayEntry.numberReached != 0 &&
+          !widget.habit.history.contains(todayEntry)) {
+        widget.habit.addHistoryEntry(newValue);
+      } else {
+        int index = widget.habit.history.indexWhere(
+          (entry) =>
+              entry.date.year == today.year &&
+              entry.date.month == today.month &&
+              entry.date.day == today.day,
+        );
+        if (index != -1) {
+          widget.habit.history[index] = todayEntry;
+        }
+      }
+      _targetNumberController.text = newValue.toString();
+      _saveToFirestore();
+      // Check if target is met
+      if (newValue == widget.habit.targetNumber! && !_showAnimation) {
+        _triggerSuccessAnimation();
+      }
+    });
+  }
+  void _triggerSuccessAnimation() {
+    setState(() {
+      _showAnimation = true;
+    });
+    debugPrint("Triggering success animation");
+    _animationController.forward();
+    _animationController.forward();
+  }
+  void _saveToFirestore() {
+    FirebaseFirestore.instance
+        .collection('habits')
+        .doc(widget.habit.habitId)
+        .update({
+      'history': widget.habit.history.map((entry) => entry.toJson()).toList(),
+    });
   }
 
   void _deleteHabit() {
@@ -116,7 +169,7 @@ class HabitDetailScreenState extends State<HabitDetailScreen>
                   children: [
                     IconButton(
                       icon: const Icon(Icons.remove, color: Colors.white),
-                      onPressed: () {},
+                      onPressed: () => _updateNumberReached(-1),
                     ),
                     Text(
                       _targetNumberController.text,
@@ -124,7 +177,7 @@ class HabitDetailScreenState extends State<HabitDetailScreen>
                     ),
                     IconButton(
                       icon: const Icon(Icons.add, color: Colors.white),
-                      onPressed: () {},
+                      onPressed: () => _updateNumberReached(1),
                     ),
                   ],
                 ),
