@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/src/models/habit_history_entry.dart';
 import 'package:habit_tracker/src/screens/habit/create_habit_screen.dart';
 import 'package:habit_tracker/src/models/habit_model.dart';
 import 'package:habit_tracker/src/screens/habit/habit_detail_screen.dart';
@@ -76,6 +77,18 @@ class _HabitScreenState extends State<HabitsScreen> {
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       var habitData = snapshot.data!.docs[index];
+
+                      List<HabitHistoryEntry> history = [];
+                      if (habitData['history'] != null) {
+                        history = (habitData['history'] as List)
+                            .map((entry) => HabitHistoryEntry(
+                                  date: DateTime.parse(entry[
+                                      'date']), // Convert string to DateTime
+                                  numberReached: entry['numberReached'],
+                                ))
+                            .toList();
+                      }
+
                       HabitModel habit = HabitModel(
                         userId: habitData['userId'],
                         name: habitData['name'],
@@ -92,6 +105,7 @@ class _HabitScreenState extends State<HabitsScreen> {
                         dayOfMonth: habitData['dayOfMonth'],
                         targetNumber: habitData['targetNumber'],
                         habitId: habitData.id,
+                        history: history
                       );
                       return Hero(
                         tag: 'habit_${habit.name}', // Add this line
