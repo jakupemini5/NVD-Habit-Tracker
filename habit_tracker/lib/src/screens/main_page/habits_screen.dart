@@ -52,6 +52,7 @@ class _HabitScreenState extends State<HabitsScreen> {
                     .collection('habits')
                     .where('userId',
                         isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                    .orderBy('createdAt', descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {

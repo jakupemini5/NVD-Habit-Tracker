@@ -110,8 +110,7 @@ class HabitProgressChart extends StatelessWidget {
             minX: 0,
             maxX: (spots.length - 1).toDouble(),
             minY: 0,
-            maxY: habit.targetNumber?.toDouble() ?? 
-                  spots.map((e) => e.y).reduce((a, b) => a > b ? a : b),
+            maxY: spots.map((e) => e.y).reduce((a, b) => a > b ? a : b),
             lineBarsData: [
               // Progress Line
               LineChartBarData(

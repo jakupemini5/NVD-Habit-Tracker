@@ -17,38 +17,48 @@ class HabitDetailScreen extends StatefulWidget {
   _HabitDetailScreenState createState() => _HabitDetailScreenState();
 }
 
-class _HabitDetailScreenState extends State<HabitDetailScreen> {
+class _HabitDetailScreenState extends State<HabitDetailScreen> with SingleTickerProviderStateMixin {
   late TextEditingController _targetNumberController;
+  late AnimationController _animationController;
   bool _showAnimation = false;
   List<String> _selectedDays = [];
-  final List<String> _daysOfWeek = [
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
-    'Sun'
-  ];
+  final List<String> _daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 1500),
+    );
+
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          _showAnimation = false;
+        });
+        _animationController.reset();
+      }
+    });
+
     int initialNumber = widget.habit.history.isNotEmpty
-        ? widget.habit.history
-            .map((e) => e.numberReached)
-            .reduce((a, b) => a > b ? a : b)
+        ? widget.habit.history.map((e) => e.numberReached).reduce((a, b) => a > b ? a : b)
         : 0;
-    _targetNumberController =
-        TextEditingController(text: initialNumber.toString());
+    _targetNumberController = TextEditingController(text: initialNumber.toString());
     if (widget.habit.type == HabitType.Weekly) {
       _selectedDays = List.from(widget.habit.daysOfWeek ?? []);
     }
   }
 
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _targetNumberController.dispose();
+    super.dispose();
+  }
+
   void _updateNumberReached(int change) {
     setState(() {
-      // Find today's history entry
       DateTime today = DateTime.now();
       HabitHistoryEntry? todayEntry = widget.habit.history.firstWhere(
         (entry) =>
@@ -58,15 +68,11 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
         orElse: () => HabitHistoryEntry(date: today, numberReached: 0),
       );
 
-      // Update the current number reached
       int current = todayEntry.numberReached;
-      int newValue =
-          (current + change).clamp(0, 999); // Prevent negative values
+      int newValue = (current + change).clamp(0, 999);
       todayEntry.numberReached = newValue;
 
-      // Create or update the history entry
-      if (todayEntry.numberReached != 0 &&
-          !widget.habit.history.contains(todayEntry)) {
+      if (todayEntry.numberReached != 0 && !widget.habit.history.contains(todayEntry)) {
         widget.habit.addHistoryEntry(newValue);
       } else {
         int index = widget.habit.history.indexWhere(
@@ -75,16 +81,16 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
               entry.date.month == today.month &&
               entry.date.day == today.day,
         );
-        widget.habit.history[index] = todayEntry;
+        if (index != -1) {
+          widget.habit.history[index] = todayEntry;
+        }
       }
 
       _targetNumberController.text = newValue.toString();
-
-      // Save to Firestore
       _saveToFirestore();
 
       // Check if target is met
-      if (newValue >= widget.habit.targetNumber!) {
+      if (newValue == widget.habit.targetNumber! && !_showAnimation) {
         _triggerSuccessAnimation();
       }
     });
@@ -94,11 +100,15 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     setState(() {
       _showAnimation = true;
     });
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        _showAnimation = false;
-      });
-    });
+
+    if (_animationController == null) {
+    debugPrint("AnimationController is not initialized yet!");
+  } else {
+    debugPrint("Triggering success animation");
+    _animationController.forward();
+  }
+
+    _animationController.forward();
   }
 
   void _saveToFirestore() {
@@ -115,58 +125,68 @@ class _HabitDetailScreenState extends State<HabitDetailScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: MyAppBar(title: widget.habit.name),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Hero(
-              tag: 'habit_${widget.habit.name}',
-              child: HabitCard(habit: widget.habit),
-            ),
-            SizedBox(height: 20),
-
-            // Target Number Controls
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                IconButton(
-                  icon: Icon(Icons.remove, color: Colors.white),
-                  onPressed: () => _updateNumberReached(-1),
+                Hero(
+                  tag: 'habit_${widget.habit.name}',
+                  child: HabitCard(habit: widget.habit),
                 ),
-                Text(
-                  _targetNumberController.text,
-                  style: TextStyle(fontSize: 24, color: Colors.white),
+                SizedBox(height: 20),
+
+                // Target Number Controls
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.remove, color: Colors.white),
+                      onPressed: () => _updateNumberReached(-1),
+                    ),
+                    Text(
+                      _targetNumberController.text,
+                      style: TextStyle(fontSize: 24, color: Colors.white),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.add, color: Colors.white),
+                      onPressed: () => _updateNumberReached(1),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(Icons.add, color: Colors.white),
-                  onPressed: () => _updateNumberReached(1),
+                SizedBox(height: 10),
+
+                // Habit History
+                Expanded(
+                  child: Column(
+                    children: [
+                      HabitProgressCard(habit: widget.habit),
+                    ],
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: 10),
-
-            // Success Animation
-            if (_showAnimation)
-              Center(
-                child: Lottie.network(
-                  'https://assets5.lottiefiles.com/packages/lf20_x62chJ.json', // Use a Lottie animation URL
-                  width: 150,
-                  height: 150,
+          ),
+          // Success Animation Overlay
+          if (_showAnimation)
+            Container(
+              color: Colors.black54,
+              child: Center(
+                child: Lottie.asset(
+                  'assets/animations/success.json',
+                  controller: _animationController,
+                  width: 400,
+                  height: 400,
+                  fit: BoxFit.contain,
+                  onLoaded: (composition) {
+                    _animationController.duration = composition.duration;
+                  },
                 ),
               ),
-            SizedBox(height: 10),
-
-            // Habit History
-            Expanded(
-              child: Column(
-                children: [
-                  HabitProgressCard(habit: widget.habit),
-                ],
-              ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
